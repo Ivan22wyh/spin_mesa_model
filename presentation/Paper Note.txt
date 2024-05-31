@@ -1,0 +1,46 @@
+
+
+光变曲线归一化
+
+Measuring the rotation period distribution of field M-dwarfs with Kepler
+
+1.The Kepler space mission (Borucki et al. 2010) now offers a unique opportunity to measure rotation periods even for slowly rotating, moderately active stars, thanks to its superior precision and long baseline.
+
+2.acf概念，优越性，（lc形状）
+
+3.高斯卷积
+
+4.相对高度However, correlated noise and residual systematics can introduce underlying long term trends, which mean the absolute peak height is no longer a good diagnostic. To mitigate this effect, we measure the height of each peak relative to the two adjacent minima, and adopt the mean of the two measurements as the ‘local height’ of the peak, denoted by hP.
+
+if hP of the second peak is greater than that of the first, the second peak is selected instead.
+
+5.整数峰In some cases, correlated noise and residual systematics produce an underlying slope at small τk, causing a shift the position of the first peak associated with the rotation period.
+
+6.不确定度
+
+7.ACF和periodogram的区别，一个适合fast evolution
+
+8.PDCMAP/K2SC
+
+9.gap filling（线性插值），stitching带来误差，分quarter学习
+
+10.观测分类，周期，多重周期，脉冲，无周期
+
+11.排除koi，eb，巨星污染？排除pulsating（0.2-70d）
+
+12. 3.6 ACF更reliable
+
+ROTATION PERIODS OF 34,030 KEPLER MAIN-SEQUENCE STARS: THE FULL AUTOCORRELATION SAMPLE
+
+3.we smoothed the ACF to allow detection of the larger underlying peaks, instead of the short period oscillations superimposed on it
+
+4.Due to the rotation of the Kepler satellite through 90◦ between quarters, the systematics can repeat every four quarters when targets appear in the same place on the CCD. This can lead to matching, but false period detections in multiple segments. It is also possible to have lowamplitude ACF peaks arising from noise, which are consistent by coincidence over multiple segments. We therefore required a second selection stage.
+
+8.抛弃q0-q3的数据
+
+11.排除pulasting，An automatic filter was applied based on the number of zero crossings per period in the smoothed LC, under the assumption that real stellar rotation signals should have a low number of zero crossings, whereas pulsations and irregular variations will have a higher number.
+
+1. sini对比真实值要考虑r,p,vsini不确定度，这些不确定度是高斯分布的，具体可以看2023那篇文章的引用
+2. 考虑vsini的选择效应，右移
+3. 实际写作的时候可以多举例子，比如90°时怎么样……
+4. 半径确定

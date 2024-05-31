@@ -1,0 +1,223 @@
+! For the sake of future readers of this file (yourself included),
+! ONLY include the controls you are actually using.  DO NOT include
+! all of the other controls that simply have their default values.
+
+&star_job
+
+    show_log_description_at_start = .false.
+
+  ! uncomment the following if you want rotation   
+    new_rotation_flag = .true.
+    change_rotation_flag = .true.
+    set_initial_surface_rotation_v = .true.
+    set_surf_rotation_v_step_limit = 30
+    !new_surface_rotation_v = 220
+
+  ! Although we use appropriate ZAMS models, we fix a constant composition at startup
+  ! to avoid strange effects, in particular with the limiting of overshoting due to
+  ! composition gradients.
+    !file_for_uniform_xa = "xa_LMC.data"
+    file_for_uniform_xa = "xa_SMC.data"
+    !file_for_uniform_xa = "xa_GAL.data"
+    set_uniform_initial_xa_from_file = .true.
+
+  ! save a model at the end
+    save_model_when_terminate = .true.
+    save_model_filename = "model1.dat"
+
+  ! slightly different simple networks
+    h_he_net = 'basic2.net'
+    co_net = 'co_burn2.net'
+
+  ! opacity tables
+    !kappa_file_prefix = "BROTT_LMC"
+    !kappa_CO_prefix = "BROTT_LMC_co"
+    !kappa_file_prefix = "BROTT_SMC"
+    !kappa_CO_prefix = "BROTT_SMC_co"
+    !kappa_file_prefix = "BROTT_GAL"
+    !kappa_CO_prefix = "BROTT_GAL_co"
+
+  ! Try different helium fractions
+    relax_initial_Y = .false.
+    new_Y = 0.25 ! the end of evolution ?????
+
+/ !end of star_job namelist
+
+
+&controls
+
+    ! 20191014: had a situation with really high (up to 0.6) rel_run_E_err values, try this
+    use_dedt_form_of_energy_eqn = .true.
+    use_gold_tolerances = .true.
+
+
+  ! PREDICTIVE MIXING
+!    predictive_mix(1) = .true.
+!    predictive_zone_type(1) = 'any'
+!    predictive_zone_loc(1) = 'core'
+!    predictive_bdy_loc(1) = 'top'
+
+
+  ! let the star lose extra specific angular momentum
+!    do_adjust_J_lost = .true.
+!    adjust_J_fraction = 1d0
+
+  ! Kill (=0) or change rotationally enhanced mass loss?
+    !mdot_omega_power = 0.43d0
+
+    ! X_CTRL PARAMETERS :)
+    x_ctrl(1) = 2d8   ! V_INF in cm/s
+    x_ctrl(2) = 2d6   ! V_INI in cm/s
+    x_ctrl(3) = 2.0  ! fraction of omega_crit at which we start to make a disk
+    x_ctrl(4) = 0.4   ! p in Krticka+2011, describes T profile
+
+  ! setup ZAMS models
+    !zams_filename = 'BROTT_LMC.data' ! LMC
+    !initial_z = 4.8410022998829991d-3 ! LMC
+    zams_filename = 'BROTT_SMC.data' ! SMC
+    initial_z = 2.1791140256616011d-3 ! SMC
+    !zams_filename = 'BROTT_GAL.data' ! GAL
+    !initial_z = 9.2091635112669119d-3 ! GAL
+
+  ! use CO enhanced opacity tables
+    !use_Type2_opacities = .true.
+    !Zbase = 4.8410022998829991d-3 ! LMC
+    !Zbase = 2.1791140256616011d-3 ! SMC
+    !Zbase = 9.2091635112669119d-3 ! GAL
+  ! If you want to compute metallicities as Brott et al. 2011, uncomment the following and comment
+  ! the previous two controls. You also need to comment kappa_file_prefix and kappa_CO_prefix in star_job.
+  ! This is implemented in run_star_extras.f
+    use_other_kap = .true.
+
+  ! wind options, we have a custom wind built in run_star_extras.f following Brott et al. 2011
+    use_other_wind = .true.
+
+  ! we use ledoux with semiconvection and thermohaline mixing
+    use_ledoux_criterion = .true.
+    mixing_length_alpha = 1.5
+    alpha_semiconvection = 10d0
+    thermohaline_coeff = 1d0
+
+  ! we use step overshooting
+  !  step_overshoot_f_above_burn_h_core = 0.345
+    overshoot_f0_above_burn_h_core = 0.01
+    step_overshoot_D0_coeff = 1.0
+
+  ! do not permit overshooting through composition gradients
+!    max_brunt_B_for_overshoot = 1d-1
+
+  ! rotational mixing coeffs
+    am_nu_ST_factor = 1.0
+    D_visc_factor = 0.0
+    am_nu_SH_factor = 0.0
+    D_ST_factor = 0.0 !1.0
+    D_SH_factor = 0.0 !1.0
+    D_GSF_factor = 1.0
+    D_ES_factor = 1.0
+    D_SSI_factor = 1.0
+    D_DSI_factor = 1.0
+    am_D_mix_factor = 0.0333d0
+    am_gradmu_factor = 0.1d0
+  !  num_cells_for_smooth_gradL_composition_term = 5
+
+    ! time smoothing.
+    ! Set to 0 to turn off time smoothing.
+    !angsmt_D_DSI = 0.2
+    !angsmt_D_SH = 0.2
+    !angsmt_D_SSI = 0.2
+    !angsmt_D_ES = 0.2
+    !angsmt_D_GSF = 0.2
+    !angsmt_D_ST = 0.2
+    !angsmt_nu_ST = 0.2
+    !angsml = 1d-3
+
+  ! premix omega to avoid doing the newton with crazily shearing material
+  ! not really necessary for single stars but it does not hurt
+    premix_omega = .true.
+
+  !extra spatial resolution for receding convective core
+    mesh_delta_coeff = 0.3            ! resolution of calculation grid, small represents high accuracy
+    max_dq = 0.001                    ! the max change of different mass shell
+    xtra_coef_above_xtrans = 0.2
+    xtra_coef_below_xtrans = 0.2
+    min_dq_for_xa = 1d-5
+
+  ! remove artificial composition softening and removal of mixing zones
+    smooth_convective_bdy = .false. 
+    remove_mixing_glitches = .false.
+
+  ! extra controls for timestep
+ !!!   varcontrol_target = 3.0d-4
+  ! these are for changes in mdot, not necessary for single stars
+    !delta_mdot_atol = 1d-5
+    !delta_mdot_rtol = 0.1
+    !delta_mdot_limit = 1
+  ! these are to properly resolve core hydrogen depletion
+    delta_lg_XH_cntr_limit = 0.02d0  ! old 0.02
+    delta_lg_XH_cntr_max = 0.0d0
+   ! delta_lg_XH_cntr_min = -6.0d0
+    delta_lg_XH_cntr_hard_limit = 0.03d0  ! old 0.03
+  ! these are to properly resolve core helium depletion
+    delta_lg_XHe_cntr_limit = 0.04d0
+    delta_lg_XHe_cntr_max = 0.0d0
+   ! delta_lg_XHe_cntr_min = -6.0d0
+    delta_lg_XHe_cntr_hard_limit = 0.03d0
+  ! these are to properly resolve core carbon depletion
+    delta_lg_XC_cntr_limit = 0.04d0
+    delta_lg_XC_cntr_max = 0.0d0
+   ! delta_lg_XC_cntr_min = -5.0d0
+    delta_lg_XC_cntr_hard_limit = 0.03d0
+  ! this is mainly to resolve properly when the star goes off the main sequence
+    delta_HR_limit = 0.005d0
+  ! I do not care about excruciating details at late stages so I relax the following control
+    dX_nuc_drop_limit = 5d-2
+  ! relax timestep limit on newton to make later phases faster
+    newton_iterations_limit = 6
+
+  ! output options
+    profile_interval = 250000
+    write_profiles_flag = .true.
+!    profile_data_prefix = 'profilio'
+!    do_history_file = .false.
+    history_interval = 5
+    max_num_profile_models = 2000
+
+  ! stop when the center mass fraction of c12 drops below this limit
+    xa_central_lower_limit_species(1) = 'he4'
+    xa_central_lower_limit(1) = 1d-2
+
+  ! if you have more than 40000 models you are probably going nowhere
+    max_model_number = 40000
+    
+  ! do not discard D_mix when it is small
+    remove_small_D_limit = 1d-50
+  ! when outputting mixing regions, do not discard small values
+    mixing_D_limit_for_log = 1d-50
+
+  ! For wind enhancement from rotation MESA softens changes depending on the value of the following control,
+  ! but this can mess things up when mdot changes sign (mass accretion). To avoid this odd behaviour we set
+  ! it to a large value
+    max_mdot_jump_for_rotation = 1d99
+
+  ! Abel: 23-12 attempt to get CHeB. Also change to varcontrol
+    okay_to_reduce_gradT_excess = .true.
+    gradT_excess_age_fraction = 0.99d0
+    gradT_excess_max_change = 0.001d0
+   
+  ! Abel noch einmal 22-01-16:
+    delta_lgL_He_limit = 0.015
+    delta_lgL_He_hard_limit = 0.025
+
+   ! controls for implicit wind
+     surf_avg_tau_min = 0
+     surf_avg_tau = 10
+     max_mdot_redo_cnt = 200
+     min_years_dt_for_redo_mdot = 0
+     surf_w_div_w_crit_limit = 0.98d0
+     surf_w_div_w_crit_tol = 0.06d0
+     rotational_mdot_boost_fac = 1d10
+     rotational_mdot_kh_fac = 1d10
+     mdot_revise_factor = 1.2
+     implicit_mdot_boost = 0.1
+
+/ ! end of controls namelist
