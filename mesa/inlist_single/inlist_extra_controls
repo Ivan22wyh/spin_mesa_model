@@ -1,8 +1,0 @@
-&star_job
-new_surface_rotation_v = 376d0
-/ !end of star_job namelist
-&controls
-initial_mass = 19.05d0
-step_overshoot_f_above_burn_h_core= 0.3d0
-/ ! end of controls namelist
-
